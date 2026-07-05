@@ -1,0 +1,6 @@
+{
+  "name": "Pembuat Modul Pembelajaran Deep Learning",
+  "description": "Aplikasi generator Modul Ajar Deep Learning (Mindful, Meaningful, Joyful Learning) untuk guru SD dengan ekspor .doc dan format lengkap.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
