@@ -165,6 +165,45 @@ export function buildDeepLearningModule(formData: ModuleFormData): GeneratedModu
         tesTertulis: subjectDb.asesmenDefault.sumatifTesTertulis
       }
     },
+    pertanyaanPemantik: [
+      `Bagaimana kita bisa menerapkan konsep ${formData.topik} dalam kehidupan kita sehari-hari?`,
+      `Mengapa penting bagi kita untuk benar-benar memahami konsep ${formData.topik}?`,
+      `Apa tantangan atau masalah nyata di sekitar kita yang bisa diselesaikan dengan pemahaman ${formData.topik}?`
+    ],
+    pemahamanBermakna: `Setelah mempelajari topik ini, peserta didik menyadari pentingnya konsep ${formData.topik} dalam memecahkan masalah nyata secara kreatif, logis, dan penuh kesadaran (mindful), serta mampu berkolaborasi untuk menciptakan solusi yang berdampak bagi lingkungan sekitar.`,
+    pengayaanRemedial: {
+      pengayaan: `Peserta didik yang telah mencapai kriteria ketercapaian diberikan tantangan lebih tinggi berupa analisis studi kasus nyata mandiri berkaitan dengan ${formData.topik} atau menjadi tutor sebaya bagi temannya.`,
+      remedial: `Guru membimbing kembali peserta didik yang belum mencapai kriteria ketercapaian secara individual atau kelompok kecil dengan menggunakan media visual atau benda konkret yang disederhanakan.`
+    },
+    bahanBacaan: {
+      guru: `Buku Panduan Guru Kurikulum Merdeka Kemendikbudristek RI sesuai BSKAP CP 046, artikel pedagogi tentang model ${formData.modelPembelajaran}, serta jurnal pendekatan pembelajaran mendalam (Deep Learning).`,
+      siswa: `Buku Siswa Mata Pelajaran ${formData.mataPelajaran} Kurikulum Merdeka, lembar rangkuman materi ringkas buatan guru mengenai ${formData.topik}, serta infografis pendukung.`
+    },
+    glosarium: `${formData.topik} : Konsep atau tema utama yang dipelajari pada kegiatan pembelajaran ini.\nDeep Learning : Pendekatan pembelajaran mendalam yang memadukan kesadaran penuh (Mindful), kebermaknaan konsep (Meaningful), dan suasana belajar gembira (Joyful).\nKurikulum Merdeka : Kurikulum nasional Indonesia dengan pembelajaran intrakurikuler yang beragam agar murid memiliki cukup waktu untuk mendalami konsep.`,
+    daftarPustaka: `Badan Standar, Kurikulum, dan Asesmen Pendidikan. (2023). Keputusan Kepala BSKAP No 046/H/KR/2023 tentang Capaian Pembelajaran Kurikulum Merdeka. Jakarta: Kemendikbudristek.\nAdmin Esstu. (2026). Panduan Praktis Implementasi Pendekatan Deep Learning Berbasis Proyek di Sekolah Dasar.`,
+    lkpd: {
+      judul: `LKPD Kreatif & Bermakna: Menyelidiki ${formData.topik}`,
+      tujuan: `Peserta didik mampu berkolaborasi aktif dalam kelompok untuk menyelidiki, menganalisis, merancang, dan menyajikan solusi karya nyata yang berkaitan dengan konsep ${formData.topik} secara gembira dan bermakna.`,
+      alatBahan: [
+        "Lembar pencatatan aktivitas / buku tugas",
+        "Alat tulis berwarna (spidol/krayon)",
+        "Media konkret pendukung atau barang bekas sekitar yang ramah lingkungan sesuai kreativitas kelompok"
+      ],
+      langkahKerja: [
+        "Berkumpullah bersama kelompok heterogen Anda dengan tertib dan penuh kesadaran (Mindful).",
+        `Amati masalah atau tantangan konkret berkaitan dengan ${formData.topik} yang disajikan oleh guru di depan kelas.`,
+        `Diskusikan ide-ide kreatif pemecahan masalah bersama seluruh anggota kelompok secara setara dan saling menghargai (Meaningful).`,
+        "Tuliskan rancangan solusi kelompok pada bagan atau lembar aktivitas LKPD ini.",
+        `Realisasikan rancangan tersebut menjadi karya nyata/miniatur/gambar kolaboratif dengan penuh semangat dan tawa gembira (Joyful).`,
+        "Sajikan hasil karya kelompok Anda di depan kelas, dan ajaklah kelompok lain memberikan umpan balik positif."
+      ],
+      aktivitasBermakna: `Eksperimen terbimbing secara berkelompok untuk mendesain prototipe/karya nyata pemecahan masalah bertema ${formData.topik}, diikuti dengan sesi diskusi interaktif menghubungkan temuan eksperimen dengan kehidupan sehari-hari siswa.`,
+      pertanyaanHOTS: [
+        `Jika situasi atau kondisi di sekitar lingkungan diubah, apakah solusi yang kelompok Anda rancang tentang ${formData.topik} masih dapat berfungsi dengan baik? Mengapa?`,
+        `Bagaimana cara kelompok Anda menyempurnakan karya/solusi tersebut agar lebih berkelanjutan dan membawa manfaat yang lebih besar bagi masyarakat luas?`
+      ],
+      refleksiSiswa: `Bagian aktivitas mana yang paling menyenangkan dan menantang bagi kelompok Anda hari ini? Apa satu hal terpenting yang baru Anda pahami tentang konsep ${formData.topik}?`
+    },
     tandaTangan: {
       namaKepalaSekolah: formData.namaKepalaSekolah,
       nipKepalaSekolah: formData.nipKepalaSekolah,
@@ -302,6 +341,61 @@ export function formatModuleToText(moduleData: GeneratedModuleContent): string {
   text += `Tugas: ${moduleData.asesmen.sumatif.praktikKinerja.tugas}\n`;
   text += `Penilaian: ${moduleData.asesmen.sumatif.praktikKinerja.penilaian}\n`;
   text += `Tes Tertulis: ${moduleData.asesmen.sumatif.tesTertulis}\n\n`;
+
+  if (moduleData.pertanyaanPemantik && moduleData.pertanyaanPemantik.length > 0) {
+    text += `I. PERTANYAAN PEMANTIK\n`;
+    moduleData.pertanyaanPemantik.forEach((q, idx) => {
+      text += `${idx + 1}. ${q}\n`;
+    });
+    text += `\n`;
+  }
+
+  if (moduleData.pemahamanBermakna) {
+    text += `J. PEMAHAMAN BERMAKNA\n`;
+    text += `${moduleData.pemahamanBermakna}\n\n`;
+  }
+
+  if (moduleData.pengayaanRemedial) {
+    text += `K. PENGAYAAN DAN REMEDIAL\n`;
+    text += `Pengayaan: ${moduleData.pengayaanRemedial.pengayaan}\n`;
+    text += `Remedial: ${moduleData.pengayaanRemedial.remedial}\n\n`;
+  }
+
+  if (moduleData.bahanBacaan) {
+    text += `L. BAHAN BACAAN GURU DAN SISWA\n`;
+    text += `Bahan Bacaan Guru: ${moduleData.bahanBacaan.guru}\n`;
+    text += `Bahan Bacaan Siswa: ${moduleData.bahanBacaan.siswa}\n\n`;
+  }
+
+  if (moduleData.lkpd) {
+    text += `LEMBAR KERJA PESERTA DIDIK (LKPD) - MENARIK, AKTIF & BERMAKNA\n`;
+    text += `Judul LKPD: ${moduleData.lkpd.judul}\n`;
+    text += `Tujuan LKPD: ${moduleData.lkpd.tujuan}\n\n`;
+    text += `Alat dan Bahan:\n`;
+    moduleData.lkpd.alatBahan.forEach((tool) => {
+      text += `- ${tool}\n`;
+    });
+    text += `\nLangkah-langkah Kerja (Mindful & Joyful):\n`;
+    moduleData.lkpd.langkahKerja.forEach((step, idx) => {
+      text += `${idx + 1}. ${step}\n`;
+    });
+    text += `\nKegiatan Pembelajaran Bermakna (Meaningful Activity):\n${moduleData.lkpd.aktivitasBermakna}\n\n`;
+    text += `Pertanyaan Tantangan HOTS (Berpikir Kritis):\n`;
+    moduleData.lkpd.pertanyaanHOTS.forEach((q) => {
+      text += `- ${q}\n`;
+    });
+    text += `\nLembar Refleksi Mandiri Siswa:\n${moduleData.lkpd.refleksiSiswa}\n\n`;
+  }
+
+  if (moduleData.glosarium) {
+    text += `M. GLOSARIUM\n`;
+    text += `${moduleData.glosarium}\n\n`;
+  }
+
+  if (moduleData.daftarPustaka) {
+    text += `N. DAFTAR PUSTAKA\n`;
+    text += `${moduleData.daftarPustaka}\n\n`;
+  }
 
   text += `Mengetahui,\n`;
   text += `Kepala Sekolah,\t\t\t\t${moduleData.tandaTangan.lokasiTanggal}\n`;

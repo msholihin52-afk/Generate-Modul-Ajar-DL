@@ -268,6 +268,70 @@ export function generateDocHtml(moduleData: GeneratedModuleContent): string {
   </ul>
   <p><b>Tes Tertulis:</b> ${moduleData.asesmen.sumatif.tesTertulis}</p>
 
+  ${moduleData.pertanyaanPemantik && moduleData.pertanyaanPemantik.length > 0 ? `
+    <div class="section-title">I. PERTANYAAN PEMANTIK</div>
+    <ol>
+      ${moduleData.pertanyaanPemantik.map(q => `<li>${q}</li>`).join('')}
+    </ol>
+  ` : ''}
+
+  ${moduleData.pemahamanBermakna ? `
+    <div class="section-title">J. PEMAHAMAN BERMAKNA</div>
+    <p>${moduleData.pemahamanBermakna}</p>
+  ` : ''}
+
+  ${moduleData.pengayaanRemedial ? `
+    <div class="section-title">K. PENGAYAAN DAN REMEDIAL</div>
+    <p><b>Pengayaan:</b> ${moduleData.pengayaanRemedial.pengayaan}</p>
+    <p><b>Remedial:</b> ${moduleData.pengayaanRemedial.remedial}</p>
+  ` : ''}
+
+  ${moduleData.bahanBacaan ? `
+    <div class="section-title">L. BAHAN BACAAN GURU DAN SISWA</div>
+    <p><b>Bahan Bacaan Guru:</b> ${moduleData.bahanBacaan.guru}</p>
+    <p><b>Bahan Bacaan Siswa:</b> ${moduleData.bahanBacaan.siswa}</p>
+  ` : ''}
+
+  ${moduleData.lkpd ? `
+    <div style="page-break-before: always; border: 2px solid #1a365d; padding: 15px; margin-top: 20px; background-color: #fafbfd;">
+      <h2 style="font-size: 13pt; font-weight: bold; text-align: center; color: #1a365d; margin-top: 0;">LEMBAR KERJA PESERTA DIDIK (LKPD)</h2>
+      <p style="text-align: center; font-weight: bold; font-size: 11pt; margin-bottom: 12px; text-transform: uppercase;">${moduleData.lkpd.judul}</p>
+      
+      <p><b>Tujuan Aktivitas:</b> ${moduleData.lkpd.tujuan}</p>
+      
+      <p><b>Alat dan Bahan:</b></p>
+      <ul>
+        ${moduleData.lkpd.alatBahan.map(tool => `<li>${tool}</li>`).join('')}
+      </ul>
+      
+      <p><b>Langkah-langkah Kerja (Pendekatan Deep Learning - Mindful & Joyful):</b></p>
+      <ol>
+        ${moduleData.lkpd.langkahKerja.map(step => `<li>${step}</li>`).join('')}
+      </ol>
+      
+      <p><b>Aktivitas Bermakna (Meaningful Learning):</b></p>
+      <p style="background-color: #f0f4f8; padding: 6px; border-left: 3px solid #1a365d; margin-left: 10px;">${moduleData.lkpd.aktivitasBermakna}</p>
+      
+      <p><b>Pertanyaan Tantangan HOTS (Berpikir Kritis):</b></p>
+      <ul>
+        ${moduleData.lkpd.pertanyaanHOTS.map(q => `<li><b>${q}</b></li>`).join('')}
+      </ul>
+      
+      <p><b>Lembar Refleksi Mandiri Siswa (Mindful Reflection):</b></p>
+      <p style="font-style: italic; color: #555555;">${moduleData.lkpd.refleksiSiswa}</p>
+    </div>
+  ` : ''}
+
+  ${moduleData.glosarium ? `
+    <div class="section-title">M. GLOSARIUM</div>
+    <p style="white-space: pre-line;">${moduleData.glosarium}</p>
+  ` : ''}
+
+  ${moduleData.daftarPustaka ? `
+    <div class="section-title">N. DAFTAR PUSTAKA</div>
+    <p style="white-space: pre-line;">${moduleData.daftarPustaka}</p>
+  ` : ''}
+
   <br>
 
   <table class="signature-table">

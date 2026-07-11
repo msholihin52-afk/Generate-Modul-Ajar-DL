@@ -176,6 +176,27 @@ export interface GeneratedModuleContent {
       tesTertulis: string;
     };
   };
+  pertanyaanPemantik?: string[];
+  pemahamanBermakna?: string;
+  pengayaanRemedial?: {
+    pengayaan: string;
+    remedial: string;
+  };
+  bahanBacaan?: {
+    guru: string;
+    siswa: string;
+  };
+  glosarium?: string;
+  daftarPustaka?: string;
+  lkpd?: {
+    judul: string;
+    tujuan: string;
+    alatBahan: string[];
+    langkahKerja: string[];
+    aktivitasBermakna: string;
+    pertanyaanHOTS: string[];
+    refleksiSiswa: string;
+  };
   tandaTangan: {
     namaKepalaSekolah: string;
     nipKepalaSekolah: string;

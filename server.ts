@@ -42,8 +42,8 @@ app.post('/api/generate-module', async (req, res) => {
       return res.json({ success: true, data: fallbackModule, source: 'local_engine' });
     }
 
-    const prompt = `Anda adalah pakar pengembang kurikulum SD dan pakar metode Deep Learning (Mindful, Meaningful, Joyful Learning) Kurikulum Merdeka Indonesia.
-Buatkan Modul Ajar Deep Learning yang sangat lengkap, kontekstual, dan inspiratif berdasarkan data berikut:
+    const prompt = `Anda adalah pakar pengembang kurikulum Sekolah Dasar dan pakar metode Deep Learning (Mindful, Meaningful, Joyful Learning) Kurikulum Merdeka Indonesia.
+Buatkan Modul Ajar Deep Learning yang sangat lengkap, kontekstual, dan inspiratif berdasarkan Keputusan Kepala BSKAP No 046/H/KR/2023 (CP 046) dan memenuhi Komponen 8.3.4 standar Permendikbud terbaru berdasarkan data berikut:
 - Nama Penyusun: ${formData.namaPenyusun}
 - NIP Penyusun: ${formData.nipPenyusun}
 - Nama Kepala Sekolah: ${formData.namaKepalaSekolah}
@@ -57,7 +57,7 @@ Buatkan Modul Ajar Deep Learning yang sangat lengkap, kontekstual, dan inspirati
 - Alokasi Waktu: ${formData.alokasiWaktu}
 - Model Pembelajaran: ${formData.modelPembelajaran}
 
-Pastikan isi Modul Ajar mencakup 8 bagian lengkap (A s.d. H) beserta Desain Pembelajaran dan Kerangka Pembelajaran Deep Learning yang kaya dan bermakna.
+Pastikan isi Modul Ajar mencakup 8 bagian lengkap (A s.d. H) yang diselaraskan dengan CP 046, serta menyertakan Lembar Kerja Peserta Didik (LKPD) yang sangat menarik, kontekstual, dan bermakna bagi siswa, lengkap dengan Glosarium, Daftar Pustaka, Pertanyaan Pemantik, Pemahaman Bermakna, Pengayaan & Remedial, dan Bahan Bacaan.
 
 Kembalikan jawaban dalam format JSON persis sesuai struktur schema berikut:
 {
@@ -72,12 +72,12 @@ Kembalikan jawaban dalam format JSON persis sesuai struktur schema berikut:
   },
   "kesiapanPesertaDidik": {
     "pengetahuanAwal": "...",
-    "minat": "Peserta didik memiliki minat yang tinggi dalam kegiatan membangun, merakit, dan berkreasi menggunakan berbagai media, termasuk barang-barang bekas.",
-    "latarBelakang": "Peserta didik memiliki pengalaman bermain dengan balok susun, lego, atau membuat hasta karya sederhana, sehingga memiliki pemahaman intuitif tentang keseimbangan dan konstruksi.",
+    "minat": "Peserta didik memiliki minat yang tinggi dalam kegiatan eksplorasi, membangun, merakit, dan berkreasi secara aktif berkaitan dengan topik ${formData.topik}.",
+    "latarBelakang": "Peserta didik memiliki pengalaman empiris relevan dengan kehidupan sehari-hari terkait dengan ${formData.topik}.",
     "kebutuhanBelajar": {
-      "visual": "Membutuhkan contoh-contoh miniatur bangunan yang inspiratif dan demonstrasi visual tentang cara menyambung berbagai jenis bahan.",
-      "auditori": "Membutuhkan diskusi kelompok untuk merancang ide dan instruksi lisan yang jelas dari guru mengenai prinsip keseimbangan dalam konstruksi 3D.",
-      "kinestetik": "Membutuhkan pengalaman praktik langsung dalam memilih, menyusun, merekatkan, dan membangun miniatur dari berbagai benda."
+      "visual": "Membutuhkan media visual yang kaya, gambar ilustratif, atau video demonstrasi tentang ${formData.topik}.",
+      "auditori": "Membutuhkan diskusi interaktif kelompok, penjelasan naratif terstruktur, dan instruksi lisan terarah dari guru.",
+      "kinestetik": "Membutuhkan kegiatan manipulatif fisik, eksperimen langsung, atau simulasi gerak/permainan terkait ${formData.topik}."
     }
   },
   "karakteristikMateri": {
@@ -189,6 +189,27 @@ Kembalikan jawaban dalam format JSON persis sesuai struktur schema berikut:
       },
       "tesTertulis": "..."
     }
+  },
+  "pertanyaanPemantik": ["pertanyaan 1", "pertanyaan 2", "pertanyaan 3"],
+  "pemahamanBermakna": "...",
+  "pengayaanRemedial": {
+    "pengayaan": "...",
+    "remedial": "..."
+  },
+  "bahanBacaan": {
+    "guru": "...",
+    "siswa": "..."
+  },
+  "glosarium": "...",
+  "daftarPustaka": "...",
+  "lkpd": {
+    "judul": "...",
+    "tujuan": "...",
+    "alatBahan": ["item 1", "item 2"],
+    "langkahKerja": ["langkah 1", "langkah 2", "langkah 3"],
+    "aktivitasBermakna": "...",
+    "pertanyaanHOTS": ["pertanyaan HOTS 1", "pertanyaan HOTS 2"],
+    "refleksiSiswa": "..."
   },
   "tandaTangan": {
     "namaKepalaSekolah": "${formData.namaKepalaSekolah}",

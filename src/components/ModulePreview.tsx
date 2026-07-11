@@ -594,6 +594,175 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
               </div>
             </section>
 
+            {/* I. PERTANYAAN PEMANTIK */}
+            {moduleData.pertanyaanPemantik && moduleData.pertanyaanPemantik.length > 0 && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  I. PERTANYAAN PEMANTIK
+                </h3>
+                <div className="bg-amber-50/50 border border-amber-200 rounded-lg p-4 space-y-2">
+                  <p className="text-xs text-amber-800 font-bold uppercase tracking-wider">Pertanyaan Pemicu Diskusi & Rasa Ingin Tahu:</p>
+                  <ul className="space-y-1.5 ml-1">
+                    {moduleData.pertanyaanPemantik.map((q, i) => (
+                      <li key={i} className="flex items-start gap-2 text-xs sm:text-sm text-slate-800">
+                        <span className="font-bold text-amber-600 shrink-0">#{i + 1}</span>
+                        <span>{q}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+            )}
+
+            {/* J. PEMAHAMAN BERMAKNA */}
+            {moduleData.pemahamanBermakna && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  J. PEMAHAMAN BERMAKNA
+                </h3>
+                <div className="bg-emerald-50/40 border border-emerald-200 rounded-lg p-4">
+                  <p className="text-xs text-emerald-800 font-bold uppercase tracking-wider mb-1">Manfaat Pembelajaran dalam Kehidupan Nyata:</p>
+                  <p className="text-xs sm:text-sm text-slate-800 italic font-medium leading-relaxed">
+                    "{moduleData.pemahamanBermakna}"
+                  </p>
+                </div>
+              </section>
+            )}
+
+            {/* K. PENGAYAAN DAN REMEDIAL */}
+            {moduleData.pengayaanRemedial && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  K. PENGAYAAN DAN REMEDIAL
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-blue-50/30 border border-blue-100 rounded-lg p-4 space-y-1">
+                    <p className="font-bold text-[11px] text-blue-800 uppercase tracking-wider">Aktivitas Pengayaan (Pencapaian Tinggi)</p>
+                    <p className="text-xs leading-relaxed text-slate-700">{moduleData.pengayaanRemedial.pengayaan}</p>
+                  </div>
+                  <div className="bg-rose-50/30 border border-rose-100 rounded-lg p-4 space-y-1">
+                    <p className="font-bold text-[11px] text-rose-800 uppercase tracking-wider">Aktivitas Remedial (Pendampingan)</p>
+                    <p className="text-xs leading-relaxed text-slate-700">{moduleData.pengayaanRemedial.remedial}</p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* L. BAHAN BACAAN GURU DAN SISWA */}
+            {moduleData.bahanBacaan && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  L. BAHAN BACAAN GURU DAN SISWA
+                </h3>
+                <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 overflow-hidden bg-slate-50/30">
+                  <div className="p-4 space-y-1">
+                    <p className="font-bold text-xs text-slate-800">Bahan Bacaan Guru:</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{moduleData.bahanBacaan.guru}</p>
+                  </div>
+                  <div className="p-4 space-y-1">
+                    <p className="font-bold text-xs text-slate-800">Bahan Bacaan Siswa:</p>
+                    <p className="text-xs text-slate-600 leading-relaxed">{moduleData.bahanBacaan.siswa}</p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* LEMBAR KERJA PESERTA DIDIK (LKPD) */}
+            {moduleData.lkpd && (
+              <section className="border-2 border-indigo-200 bg-indigo-50/10 rounded-xl p-5 sm:p-6 space-y-4 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 bg-indigo-600 text-white font-extrabold text-[10px] px-3 py-1 uppercase rounded-bl-lg tracking-widest">
+                  LKPD Kurikulum Merdeka (CP 046)
+                </div>
+                
+                <div className="space-y-1 pb-2 border-b border-indigo-100">
+                  <h3 className="font-bold text-sm sm:text-base text-indigo-900 uppercase tracking-wide">
+                    LEMBAR KERJA PESERTA DIDIK (LKPD)
+                  </h3>
+                  <p className="text-xs font-bold text-slate-700 uppercase">{moduleData.lkpd.judul}</p>
+                </div>
+
+                <div className="space-y-2 text-xs sm:text-sm">
+                  <div>
+                    <span className="font-bold text-indigo-950 block">🎯 Tujuan Aktivitas:</span>
+                    <p className="text-slate-700 leading-relaxed">{moduleData.lkpd.tujuan}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    <div className="bg-white/80 p-3.5 rounded-lg border border-indigo-100 space-y-1.5">
+                      <span className="font-bold text-indigo-950 text-xs block">🛠️ Alat dan Bahan:</span>
+                      <ul className="list-disc list-inside text-xs text-slate-600 space-y-0.5">
+                        {moduleData.lkpd.alatBahan.map((tool, i) => (
+                          <li key={i}>{tool}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-indigo-50/30 p-3.5 rounded-lg border border-indigo-100 space-y-1.5">
+                      <span className="font-bold text-indigo-950 text-xs block">🌱 Aktivitas Pembelajaran Bermakna:</span>
+                      <p className="text-xs text-slate-600 leading-relaxed">{moduleData.lkpd.aktivitasBermakna}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <span className="font-bold text-indigo-950 block mb-1">📝 Langkah-langkah Kerja (Pendekatan Deep Learning - Mindful & Joyful):</span>
+                    <ol className="list-decimal list-inside text-xs text-slate-600 space-y-1.5 pl-1">
+                      {moduleData.lkpd.langkahKerja.map((step, i) => (
+                        <li key={i} className="leading-relaxed">
+                          <span className="font-medium text-slate-800">{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  <div className="pt-2 bg-white/70 p-4 rounded-lg border border-indigo-100 space-y-1.5">
+                    <span className="font-bold text-indigo-950 block">🧠 Tantangan Berpikir Kritis (Pertanyaan HOTS):</span>
+                    <ul className="list-disc list-inside text-xs text-slate-700 space-y-1 pl-1">
+                      {moduleData.lkpd.pertanyaanHOTS.map((q, i) => (
+                        <li key={i} className="leading-relaxed">
+                          <b>{q}</b>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="pt-2">
+                    <span className="font-bold text-indigo-950 block">💬 Lembar Refleksi Mandiri Siswa (Mindful Reflection):</span>
+                    <p className="text-xs text-slate-600 italic bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">
+                      "{moduleData.lkpd.refleksiSiswa}"
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* M. GLOSARIUM */}
+            {moduleData.glosarium && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  M. GLOSARIUM
+                </h3>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                  <pre className="text-xs text-slate-600 font-sans whitespace-pre-wrap leading-relaxed">
+                    {moduleData.glosarium}
+                  </pre>
+                </div>
+              </section>
+            )}
+
+            {/* N. DAFTAR PUSTAKA */}
+            {moduleData.daftarPustaka && (
+              <section className="space-y-2">
+                <h3 className="font-bold text-xs sm:text-sm text-slate-900 uppercase tracking-wider">
+                  N. DAFTAR PUSTAKA
+                </h3>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                  <pre className="text-xs text-slate-600 font-sans whitespace-pre-wrap leading-relaxed">
+                    {moduleData.daftarPustaka}
+                  </pre>
+                </div>
+              </section>
+            )}
+
             {/* BAGIAN TANDA TANGAN */}
             <div className="pt-12 grid grid-cols-2 text-center text-xs sm:text-sm gap-8 font-sans">
               <div>
