@@ -12,7 +12,199 @@ import {
   Eye,
   CheckCircle2,
   BookOpen,
+  RotateCcw,
 } from 'lucide-react';
+
+// Beautiful renderer that parses custom edited text into high-fidelity styled React elements
+const RenderCustomText: React.FC<{ text: string }> = ({ text }) => {
+  const lines = text.split('\n');
+  const renderedElements: React.ReactNode[] = [];
+  
+  let insideUl = false;
+  let insideOl = false;
+  let ulItems: React.ReactNode[] = [];
+  let olItems: React.ReactNode[] = [];
+  
+  const flushLists = (key: string) => {
+    if (insideUl && ulItems.length > 0) {
+      renderedElements.push(
+        <ul key={`ul-${key}`} className="list-disc pl-5 my-2 space-y-1 text-xs sm:text-sm text-slate-800">
+          {...ulItems}
+        </ul>
+      );
+      ulItems = [];
+      insideUl = false;
+    }
+    if (insideOl && olItems.length > 0) {
+      renderedElements.push(
+        <ol key={`ol-${key}`} className="list-decimal pl-5 my-2 space-y-1 text-xs sm:text-sm text-slate-800">
+          {...olItems}
+        </ol>
+      );
+      olItems = [];
+      insideOl = false;
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushLists(idx.toString());
+      renderedElements.push(<div key={`br-${idx}`} className="h-2"></div>);
+      return;
+    }
+
+    // Header checking (A. B. C. or big sections)
+    const isSectionHeader = /^[A-N]\.\s+[A-Z\s\-]+$/.test(trimmed) || 
+                            trimmed.startsWith('DESAIN PEMBELAJARAN') || 
+                            trimmed.includes('LEMBAR KERJA PESERTA DIDIK') ||
+                            trimmed.startsWith('MODUL AJAR DEEP LEARNING');
+
+    if (isSectionHeader) {
+      flushLists(idx.toString());
+      if (trimmed.startsWith('MODUL AJAR DEEP LEARNING') || trimmed.startsWith('DESAIN PEMBELAJARAN')) {
+        renderedElements.push(
+          <div key={idx} className="text-center border-b-2 border-slate-900 pb-4 my-6 space-y-1">
+            <h1 className="text-lg sm:text-xl font-extrabold tracking-wide uppercase text-slate-900">
+              {trimmed}
+            </h1>
+          </div>
+        );
+      } else if (trimmed.includes('LEMBAR KERJA PESERTA DIDIK')) {
+        renderedElements.push(
+          <div key={idx} className="page-break-before border-2 border-slate-900 p-4 my-6 bg-slate-50 text-center rounded-lg">
+            <h2 className="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-wide">
+              {trimmed}
+            </h2>
+          </div>
+        );
+      } else {
+        renderedElements.push(
+          <h3 key={idx} className="font-bold text-xs sm:text-sm bg-slate-50 px-3 py-1.5 text-slate-900 border-l-4 border-slate-800 uppercase tracking-wide mt-6 mb-3">
+            {trimmed}
+          </h3>
+        );
+      }
+      return;
+    }
+
+    // Subheader checking
+    if (trimmed.startsWith('PERTEMUAN') || 
+        trimmed.startsWith('KEGIATAN PENDAHULUAN') || 
+        trimmed.startsWith('KEGIATAN INTI') || 
+        trimmed.startsWith('KEGIATAN PENUTUP') || 
+        trimmed.startsWith('ASESMEN DIAGNOSTIK') || 
+        trimmed.startsWith('ASESMEN FORMATIF') || 
+        trimmed.startsWith('ASESMEN SUMATIF') ||
+        trimmed.startsWith('LINGKUNGAN BELAJAR') ||
+        trimmed.startsWith('PEMANFAATAN DIGITAL') ||
+        trimmed.startsWith('Kebutuhan Belajar:') ||
+        trimmed.startsWith('Praktik (Kinerja):') ||
+        trimmed.startsWith('Produk (Proyek):')) {
+      flushLists(idx.toString());
+      const isPertemuan = trimmed.startsWith('PERTEMUAN');
+      renderedElements.push(
+        <h4 key={idx} className={`font-bold text-xs sm:text-sm mt-4 mb-2 uppercase pb-1 border-b border-slate-200 ${isPertemuan ? 'text-indigo-900' : 'text-slate-800'}`}>
+          {trimmed}
+        </h4>
+      );
+      return;
+    }
+
+    // Bullet items
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      if (insideOl) flushLists(idx.toString());
+      insideUl = true;
+      const content = trimmed.substring(2);
+      const boldMatch = content.match(/^([^:]+):(.*)$/);
+      if (boldMatch) {
+        ulItems.push(
+          <li key={`li-${idx}`} className="leading-relaxed mb-1">
+            <span className="font-semibold text-slate-900">{boldMatch[1]}:</span>{boldMatch[2]}
+          </li>
+        );
+      } else {
+        ulItems.push(
+          <li key={`li-${idx}`} className="leading-relaxed mb-1">
+            {content}
+          </li>
+        );
+      }
+      return;
+    }
+
+    // Numbered items
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+    if (numMatch) {
+      if (insideUl) flushLists(idx.toString());
+      insideOl = true;
+      const content = numMatch[2];
+      const boldMatch = content.match(/^([^:]+):(.*)$/);
+      if (boldMatch) {
+        olItems.push(
+          <li key={`li-${idx}`} className="leading-relaxed mb-1">
+            <span className="font-semibold text-slate-900">{boldMatch[1]}:</span>{boldMatch[2]}
+          </li>
+        );
+      } else {
+        olItems.push(
+          <li key={`li-${idx}`} className="leading-relaxed mb-1">
+            {content}
+          </li>
+        );
+      }
+      return;
+    }
+
+    // Default line
+    flushLists(idx.toString());
+    const labelMatch = trimmed.match(/^([^:]+):(.*)$/);
+    if (labelMatch && (
+      trimmed.startsWith('Judul') || 
+      trimmed.startsWith('Tujuan') || 
+      trimmed.startsWith('Alat dan Bahan') || 
+      trimmed.startsWith('Langkah-langkah') || 
+      trimmed.startsWith('Kegiatan Pembelajaran') || 
+      trimmed.startsWith('Pertanyaan Tantangan') || 
+      trimmed.startsWith('Lembar Refleksi') ||
+      trimmed.startsWith('Bahan Bacaan') ||
+      trimmed.startsWith('Pengayaan') ||
+      trimmed.startsWith('Remedial') ||
+      trimmed.startsWith('Nama Sekolah') ||
+      trimmed.startsWith('Nama Penyusun') ||
+      trimmed.startsWith('Mata Pelajaran') ||
+      trimmed.startsWith('Kelas') ||
+      trimmed.startsWith('Alokasi Waktu') ||
+      trimmed.startsWith('Topik')
+    )) {
+      if (trimmed.startsWith('Kegiatan Pembelajaran Bermakna') || trimmed.startsWith('Lembar Refleksi Mandiri') || trimmed.startsWith('Aktivitas Bermakna')) {
+        renderedElements.push(
+          <div key={idx} className="my-3">
+            <p className="font-bold text-xs uppercase text-indigo-950 mb-1">{labelMatch[1]}:</p>
+            <div className="bg-slate-50 border-l-4 border-indigo-600 p-4 italic text-xs sm:text-sm text-slate-700 rounded-r-lg">
+              {labelMatch[2]}
+            </div>
+          </div>
+        );
+      } else {
+        renderedElements.push(
+          <p key={idx} className="my-2 text-xs sm:text-sm text-slate-800">
+            <strong className="text-slate-900">{labelMatch[1]}:</strong>{labelMatch[2]}
+          </p>
+        );
+      }
+    } else {
+      renderedElements.push(
+        <p key={idx} className="my-1.5 text-xs sm:text-sm text-slate-800 leading-relaxed text-justify">
+          {trimmed}
+        </p>
+      );
+    }
+  });
+
+  flushLists("end");
+  return <div className="space-y-4">{renderedElements}</div>;
+};
 
 interface ModulePreviewProps {
   moduleData: GeneratedModuleContent | null;
@@ -23,6 +215,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [customText, setCustomText] = useState('');
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   // Reset customText and editing mode when a new module is generated
   useEffect(() => {
@@ -77,6 +270,64 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
     window.print();
   };
 
+  const handleDownloadPdf = () => {
+    if (!moduleData) return;
+    setIsDownloadingPdf(true);
+    
+    // Target the container that holds the printable content
+    const element = document.querySelector('.printable-document-card');
+    if (!element || !(element instanceof HTMLElement)) {
+      setIsDownloadingPdf(false);
+      return;
+    }
+
+    const sanitizedSubject = moduleData.identitas.mataPelajaran.replace(/[^a-zA-Z0-9]/g, '_');
+    const filename = `Modul_Ajar_Deep_Learning_${sanitizedSubject}.pdf`;
+
+    const opt = {
+      margin:       12, // 12mm margins
+      filename:     filename,
+      image:        { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas:  { 
+        scale: 2.5, // Ultra-sharp rendering resolution
+        useCORS: true, 
+        logging: false 
+      },
+      jsPDF:        { 
+        unit: 'mm' as const, 
+        format: 'a4' as const, 
+        orientation: 'portrait' as const 
+      },
+      pagebreak: { 
+        mode: ['avoid-all', 'css', 'legacy'] as any 
+      }
+    };
+
+    // Load html2pdf dynamically on-click to optimize initial app load time
+    import('html2pdf.js').then((html2pdfModule) => {
+      const html2pdf = html2pdfModule.default;
+      html2pdf()
+        .from(element)
+        .set(opt)
+        .save()
+        .then(() => {
+          setIsDownloadingPdf(false);
+        })
+        .catch((err: any) => {
+          console.error('PDF generation error:', err);
+          setIsDownloadingPdf(false);
+        });
+    }).catch((err) => {
+      console.error('Failed to load html2pdf.js:', err);
+      setIsDownloadingPdf(false);
+    });
+  };
+
+  const handleResetEdit = () => {
+    setCustomText('');
+    setIsEditing(false);
+  };
+
   const toggleEditMode = () => {
     if (!isEditing) {
       setCustomText(formatModuleToText(moduleData));
@@ -87,7 +338,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
       {/* ACTION HEADER BAR */}
-      <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 print-force-hide">
+      <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3 print-force-hide">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -116,6 +367,25 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
             <span>{copied ? 'Teks Tersalin!' : 'Salin Teks'}</span>
           </button>
 
+          {/* Tombol Download PDF */}
+          <button
+            type="button"
+            disabled={isDownloadingPdf}
+            onClick={handleDownloadPdf}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold text-xs transition shadow-sm ${
+              isDownloadingPdf
+                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                : 'bg-rose-600 hover:bg-rose-700 text-white'
+            }`}
+          >
+            {isDownloadingPdf ? (
+              <div className="w-3.5 h-3.5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            <span>{isDownloadingPdf ? 'Memproses PDF...' : 'Download PDF'}</span>
+          </button>
+
           {/* Tombol Download .doc */}
           <button
             type="button"
@@ -126,7 +396,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
             <span>Download .doc</span>
           </button>
 
-          {/* Mode Toggle & Print */}
+          {/* Mode Toggle */}
           <button
             type="button"
             onClick={toggleEditMode}
@@ -136,13 +406,27 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
             <span>{isEditing ? 'Preview' : 'Edit Teks'}</span>
           </button>
 
+          {/* Reset Edit Button */}
+          {customText && (
+            <button
+              type="button"
+              onClick={handleResetEdit}
+              title="Kembalikan ke Desain Asli"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold border border-red-200 transition"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-red-500" />
+              <span>Reset Edit</span>
+            </button>
+          )}
+
+          {/* Cetak / Simpan PDF Button */}
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold border border-slate-200 transition"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-600 text-xs font-semibold border border-slate-200 transition shadow-sm"
           >
             <Printer className="w-3.5 h-3.5 text-slate-500" />
-            <span>Cetak</span>
+            <span>Cetak / Simpan PDF</span>
           </button>
         </div>
       </div>
@@ -171,8 +455,12 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
 
         {/* PREVIEW MODE / PRINTABLE DOCUMENT CONTAINER */}
         <div className={`bg-white p-8 sm:p-12 rounded-xl shadow-sm border border-slate-200 space-y-6 text-xs sm:text-sm max-w-3xl mx-auto leading-relaxed printable-document-card ${isEditing ? 'hidden print-force-show' : 'block'}`}>
-            {/* DOCUMENT HEADER */}
-            <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
+          {customText ? (
+            <RenderCustomText text={customText} />
+          ) : (
+            <>
+              {/* DOCUMENT HEADER */}
+              <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
               <h1 className="text-lg sm:text-xl font-extrabold tracking-wide uppercase text-slate-900">
                 MODUL AJAR DEEP LEARNING
               </h1>
@@ -792,9 +1080,11 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
                 <p>NIP. {moduleData.tandaTangan.nipGuru}</p>
               </div>
             </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
+    </div>
   );
 };
 

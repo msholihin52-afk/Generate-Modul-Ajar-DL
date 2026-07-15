@@ -367,26 +367,135 @@ export function downloadDocFile(moduleData: GeneratedModuleContent, editedText?:
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // Convert escaped plain text lines to beautiful Word-compatible HTML
-    const formattedBody = escapedText.split('\n').map(line => {
+    let insideUl = false;
+    let insideOl = false;
+    const formattedLines: string[] = [];
+
+    const lines = escapedText.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       const trimmed = line.trim();
+
       if (!trimmed) {
-        return '<p>&nbsp;</p>';
+        if (insideUl) { formattedLines.push('</ul>'); insideUl = false; }
+        if (insideOl) { formattedLines.push('</ol>'); insideOl = false; }
+        formattedLines.push('<p>&nbsp;</p>');
+        continue;
       }
+
+      // Check for main Section Headers (e.g., A. IDENTITAS MODUL, etc., or DESAIN PEMBELAJARAN, or LEMBAR KERJA PESERTA DIDIK)
+      const isSectionHeader = /^[A-N]\.\s+[A-Z\s\-]+$/.test(trimmed) || 
+                              trimmed.startsWith('DESAIN PEMBELAJARAN') || 
+                              trimmed.includes('LEMBAR KERJA PESERTA DIDIK') ||
+                              trimmed.startsWith('MODUL AJAR DEEP LEARNING');
       
-      // Look for Section Titles (A., B., C., etc.) to format as header boxes
-      if (/^[A-N]\.\s+[A-Z\s\-]+$/.test(trimmed) || trimmed === 'DESAIN PEMBELAJARAN' || trimmed === 'LEMBAR KERJA PESERTA DIDIK (LKPD)') {
-        return `<h3 style="font-size: 11pt; font-weight: bold; margin-top: 14px; margin-bottom: 6px; background-color: #f2f2f2; padding: 3px 6px; border-left: 4px solid #1a365d; text-transform: uppercase;">${trimmed}</h3>`;
+      if (isSectionHeader) {
+        if (insideUl) { formattedLines.push('</ul>'); insideUl = false; }
+        if (insideOl) { formattedLines.push('</ol>'); insideOl = false; }
+        
+        if (trimmed.startsWith('MODUL AJAR DEEP LEARNING') || trimmed.startsWith('DESAIN PEMBELAJARAN')) {
+          formattedLines.push(`<h2 style="font-size: 13pt; font-weight: bold; text-align: center; color: #1a365d; margin-top: 18px; margin-bottom: 10px; text-transform: uppercase; border-bottom: 2px solid #1a365d; padding-bottom: 5px;">${trimmed}</h2>`);
+        } else if (trimmed.includes('LEMBAR KERJA PESERTA DIDIK')) {
+          formattedLines.push(`<div style="page-break-before: always; border: 2px solid #1a365d; padding: 12px; margin-top: 20px; background-color: #fafbfd; margin-bottom: 12px;"><h2 style="font-size: 13pt; font-weight: bold; text-align: center; color: #1a365d; margin: 0; text-transform: uppercase;">${trimmed}</h2></div>`);
+        } else {
+          formattedLines.push(`<h3 style="font-size: 11pt; font-weight: bold; margin-top: 14px; margin-bottom: 6px; background-color: #f2f2f2; padding: 4px 8px; border-left: 4px solid #1a365d; text-transform: uppercase; color: #1a365d;">${trimmed}</h3>`);
+        }
+        continue;
       }
-      
-      // Look for subheadings or specific sub-elements like PERTEMUAN
-      if (trimmed.startsWith('PERTEMUAN') || trimmed.startsWith('MODUL AJAR DEEP LEARNING')) {
-        return `<h2 style="font-size: 12pt; font-weight: bold; text-align: center; margin-top: 18px; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 3px;">${trimmed}</h2>`;
+
+      // Check for Subheadings like PERTEMUAN X or KEGIATAN PENDAHULUAN
+      if (trimmed.startsWith('PERTEMUAN') || 
+          trimmed.startsWith('KEGIATAN PENDAHULUAN') || 
+          trimmed.startsWith('KEGIATAN INTI') || 
+          trimmed.startsWith('KEGIATAN PENUTUP') || 
+          trimmed.startsWith('ASESMEN DIAGNOSTIK') || 
+          trimmed.startsWith('ASESMEN FORMATIF') || 
+          trimmed.startsWith('ASESMEN SUMATIF') ||
+          trimmed.startsWith('LINGKUNGAN BELAJAR') ||
+          trimmed.startsWith('PEMANFAATAN DIGITAL') ||
+          trimmed.startsWith('Kebutuhan Belajar:') ||
+          trimmed.startsWith('Praktik (Kinerja):') ||
+          trimmed.startsWith('Produk (Proyek):')) {
+        if (insideUl) { formattedLines.push('</ul>'); insideUl = false; }
+        if (insideOl) { formattedLines.push('</ol>'); insideOl = false; }
+        
+        const isPertemuan = trimmed.startsWith('PERTEMUAN');
+        formattedLines.push(`<p style="font-size: 11pt; font-weight: bold; margin-top: 10px; margin-bottom: 4px; color: ${isPertemuan ? '#1a365d' : '#333333'}; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px;">${trimmed}</p>`);
+        continue;
       }
-      
-      // Render standard lines as justified paragraphs
-      return `<p style="margin-top: 2px; margin-bottom: 6px; text-align: justify;">${trimmed}</p>`;
-    }).join('\n');
+
+      // Check for bullet list items (starts with "- " or "* ")
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        if (insideOl) { formattedLines.push('</ol>'); insideOl = false; }
+        if (!insideUl) { formattedLines.push('<ul style="margin-top: 2px; margin-bottom: 6px; padding-left: 20px;">'); insideUl = true; }
+        
+        const content = trimmed.substring(2);
+        // Format bold prefix if present (e.g. "Orientasi: ...")
+        const boldMatch = content.match(/^([^:]+):(.*)$/);
+        if (boldMatch) {
+          formattedLines.push(`<li style="margin-bottom: 3px; text-align: justify;"><b>${boldMatch[1]}:</b>${boldMatch[2]}</li>`);
+        } else {
+          formattedLines.push(`<li style="margin-bottom: 3px; text-align: justify;">${content}</li>`);
+        }
+        continue;
+      }
+
+      // Check for numbered list items (starts with "1. ", "2. ", etc.)
+      const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+      if (numMatch) {
+        if (insideUl) { formattedLines.push('</ul>'); insideUl = false; }
+        if (!insideOl) { formattedLines.push('<ol style="margin-top: 2px; margin-bottom: 6px; padding-left: 20px;">'); insideOl = true; }
+        
+        const content = numMatch[2];
+        const boldMatch = content.match(/^([^:]+):(.*)$/);
+        if (boldMatch) {
+          formattedLines.push(`<li style="margin-bottom: 3px; text-align: justify;"><b>${boldMatch[1]}:</b>${boldMatch[2]}</li>`);
+        } else {
+          formattedLines.push(`<li style="margin-bottom: 3px; text-align: justify;">${content}</li>`);
+        }
+        continue;
+      }
+
+      // Standard line formatting
+      if (insideUl) { formattedLines.push('</ul>'); insideUl = false; }
+      if (insideOl) { formattedLines.push('</ol>'); insideOl = false; }
+
+      // Look for specific LKPD or general metadata labels to highlight
+      const labelMatch = trimmed.match(/^([^:]+):(.*)$/);
+      if (labelMatch && (
+        trimmed.startsWith('Judul') || 
+        trimmed.startsWith('Tujuan') || 
+        trimmed.startsWith('Alat dan Bahan') || 
+        trimmed.startsWith('Langkah-langkah') || 
+        trimmed.startsWith('Kegiatan Pembelajaran') || 
+        trimmed.startsWith('Pertanyaan Tantangan') || 
+        trimmed.startsWith('Lembar Refleksi') ||
+        trimmed.startsWith('Bahan Bacaan') ||
+        trimmed.startsWith('Pengayaan') ||
+        trimmed.startsWith('Remedial') ||
+        trimmed.startsWith('Nama Sekolah') ||
+        trimmed.startsWith('Nama Penyusun') ||
+        trimmed.startsWith('Mata Pelajaran') ||
+        trimmed.startsWith('Kelas') ||
+        trimmed.startsWith('Alokasi Waktu') ||
+        trimmed.startsWith('Topik')
+      )) {
+        // Special highlighted callout boxes for big sections in LKPD
+        if (trimmed.startsWith('Kegiatan Pembelajaran Bermakna') || trimmed.startsWith('Lembar Refleksi Mandiri') || trimmed.startsWith('Aktivitas Bermakna')) {
+          formattedLines.push(`<p style="margin-top: 8px; margin-bottom: 3px; font-weight: bold; color: #1a365d; text-transform: uppercase; font-size: 10pt;">${labelMatch[1]}:</p>
+          <div style="background-color: #f0f4f8; padding: 10px; border-left: 3px solid #1a365d; margin-bottom: 10px; text-align: justify; font-style: italic;">${labelMatch[2]}</div>`);
+        } else {
+          formattedLines.push(`<p style="margin-top: 4px; margin-bottom: 4px; text-align: justify;"><b>${labelMatch[1]}:</b>${labelMatch[2]}</p>`);
+        }
+      } else {
+        formattedLines.push(`<p style="margin-top: 2px; margin-bottom: 6px; text-align: justify;">${trimmed}</p>`);
+      }
+    }
+
+    if (insideUl) formattedLines.push('</ul>');
+    if (insideOl) formattedLines.push('</ol>');
+
+    const formattedBody = formattedLines.join('\n');
 
     htmlContent = `<!DOCTYPE html>
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
