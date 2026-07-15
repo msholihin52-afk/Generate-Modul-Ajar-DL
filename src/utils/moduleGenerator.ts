@@ -91,7 +91,8 @@ export function buildDeepLearningModule(formData: ModuleFormData): GeneratedModu
       kelas: formData.kelas,
       fase: fase,
       semester: formData.semester,
-      alokasiWaktu: formData.alokasiWaktu
+      alokasiWaktu: formData.alokasiWaktu,
+      topik: formData.topik
     },
     kesiapanPesertaDidik: {
       pengetahuanAwal: subjectDb.pengetahuanAwal,

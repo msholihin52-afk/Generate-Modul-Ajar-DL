@@ -106,7 +106,7 @@ export default function App() {
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 animate-bounce bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-slate-700 flex items-center gap-2 text-xs font-semibold">
+        <div className="fixed top-4 right-4 z-50 animate-bounce bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-slate-700 flex items-center gap-2 text-xs font-semibold print-force-hide">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span>{toastMessage}</span>
         </div>
@@ -115,7 +115,7 @@ export default function App() {
       {/* MAIN CONTAINER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
         {/* BANNER DEEP LEARNING BRIEF */}
-        <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="bg-white border border-slate-200 p-5 rounded-xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 print-force-hide">
           <div className="space-y-1 text-center md:text-left">
             <h3 className="font-bold text-sm text-slate-900 flex items-center justify-center md:justify-start gap-2 uppercase tracking-wide">
               <Sparkles className="w-4 h-4 text-blue-600" />
@@ -134,7 +134,7 @@ export default function App() {
         {/* TWO COLUMN LAYOUT: FORM & RESULT */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* FORM INPUTS (LEFT COLUMN: 5 COLS ON DESKTOP) */}
-          <div className="lg:col-span-5 space-y-6">
+          <div className="lg:col-span-5 space-y-6 print-force-hide">
             <FormInputs
               formData={formData}
               onChange={setFormData}
@@ -153,7 +153,7 @@ export default function App() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-white border-t border-slate-200 py-5 text-xs text-slate-500 mt-12 flex-none">
+      <footer className="bg-white border-t border-slate-200 py-5 text-xs text-slate-500 mt-12 flex-none print-force-hide">
         <div className="max-w-7xl mx-auto px-4 text-center space-y-1">
           <p className="font-bold text-slate-800 uppercase tracking-wider">
             PEMBUAT MODUL PEMBELAJARAN DEEP LEARNING — By. Admin Esstu

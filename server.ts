@@ -68,7 +68,8 @@ Kembalikan jawaban dalam format JSON persis sesuai struktur schema berikut:
     "kelas": "${formData.kelas}",
     "fase": "${formData.fase}",
     "semester": "${formData.semester}",
-    "alokasiWaktu": "${formData.alokasiWaktu}"
+    "alokasiWaktu": "${formData.alokasiWaktu}",
+    "topik": "${formData.topik}"
   },
   "kesiapanPesertaDidik": {
     "pengetahuanAwal": "...",

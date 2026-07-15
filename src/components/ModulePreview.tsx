@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GeneratedModuleContent } from '../types';
 import { formatModuleToText } from '../utils/moduleGenerator';
 import { downloadDocFile, copyTextToClipboard } from '../utils/docExport';
@@ -23,6 +23,12 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [customText, setCustomText] = useState('');
+
+  // Reset customText and editing mode when a new module is generated
+  useEffect(() => {
+    setCustomText('');
+    setIsEditing(false);
+  }, [moduleData]);
 
   if (isLoading) {
     return (
@@ -64,7 +70,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   };
 
   const handleDownloadDoc = () => {
-    downloadDocFile(moduleData);
+    downloadDocFile(moduleData, customText || undefined);
   };
 
   const handlePrint = () => {
@@ -81,7 +87,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
       {/* ACTION HEADER BAR */}
-      <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-slate-50 border-b border-slate-200 px-5 py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3 print-force-hide">
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -142,7 +148,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
       </div>
 
       {copied && (
-        <div className="bg-emerald-50 border-b border-emerald-200 px-5 py-2.5 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+        <div className="bg-emerald-50 border-b border-emerald-200 px-5 py-2.5 text-emerald-800 text-xs font-semibold flex items-center gap-2 print-force-hide">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           <span>Teks modul ajar berhasil disalin ke clipboard! Silakan paste ke dokumen Anda.</span>
         </div>
@@ -150,20 +156,21 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
 
       {/* DOCUMENT CONTENT / EDIT AREA */}
       <div className="p-5 sm:p-8 bg-slate-50/50 min-h-[600px] max-h-[85vh] overflow-y-auto font-sans text-slate-800 printable-document">
-        {isEditing ? (
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
-              Edit Langsung Teks Modul Ajar (Perubahan disimpan untuk Salin Teks):
-            </label>
-            <textarea
-              value={customText}
-              onChange={(e) => setCustomText(e.target.value)}
-              rows={28}
-              className="w-full p-4 font-mono text-xs text-slate-900 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-            />
-          </div>
-        ) : (
-          <div className="bg-white p-8 sm:p-12 rounded-xl shadow-sm border border-slate-200 space-y-6 text-xs sm:text-sm max-w-3xl mx-auto leading-relaxed">
+        {/* EDITING MODE CONTAINER */}
+        <div className={`space-y-2 print-force-hide ${isEditing ? 'block' : 'hidden'}`}>
+          <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
+            Edit Langsung Teks Modul Ajar (Perubahan disimpan untuk Salin Teks):
+          </label>
+          <textarea
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            rows={28}
+            className="w-full p-4 font-mono text-xs text-slate-900 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
+          />
+        </div>
+
+        {/* PREVIEW MODE / PRINTABLE DOCUMENT CONTAINER */}
+        <div className={`bg-white p-8 sm:p-12 rounded-xl shadow-sm border border-slate-200 space-y-6 text-xs sm:text-sm max-w-3xl mx-auto leading-relaxed printable-document-card ${isEditing ? 'hidden print-force-show' : 'block'}`}>
             {/* DOCUMENT HEADER */}
             <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
               <h1 className="text-lg sm:text-xl font-extrabold tracking-wide uppercase text-slate-900">
@@ -173,7 +180,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
                 MATA PELAJARAN : {moduleData.identitas.mataPelajaran.toUpperCase()}
               </p>
               <p className="font-bold text-slate-700 text-xs sm:text-sm uppercase">
-                TOPIK : {moduleData.identitas.alokasiWaktu ? moduleData.identitas.alokasiWaktu : ''}
+                TOPIK : {moduleData.identitas.topik ? moduleData.identitas.topik : ''}
               </p>
             </div>
 
@@ -204,6 +211,10 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
                 <span className="font-medium text-slate-600">Alokasi Waktu</span>
                 <span>:</span>
                 <span className="font-semibold text-slate-900">{moduleData.identitas.alokasiWaktu}</span>
+
+                <span className="font-medium text-slate-600">Topik / Tema</span>
+                <span>:</span>
+                <span className="font-semibold text-slate-900">{moduleData.identitas.topik}</span>
               </div>
             </section>
 
@@ -782,9 +793,8 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
   );
 };
 

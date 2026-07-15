@@ -82,6 +82,7 @@ export interface GeneratedModuleContent {
     fase: string;
     semester: string;
     alokasiWaktu: string;
+    topik: string;
   };
   kesiapanPesertaDidik: {
     pengetahuanAwal: string;

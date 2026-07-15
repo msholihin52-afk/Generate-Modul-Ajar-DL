@@ -4,3 +4,81 @@
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
 }
+
+/* HIGH FIDELITY PRINT STYLES */
+@media print {
+  html, body, #root {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Hide all non-printable blocks from layout entirely */
+  .print-force-hide,
+  header,
+  footer,
+  aside,
+  button,
+  [type="button"],
+  nav,
+  .toast,
+  .lg\:col-span-5 {
+    display: none !important;
+  }
+
+  /* Reset outer layout wrappers to act as full-width blocks */
+  .min-h-screen,
+  main,
+  .grid,
+  .lg\:col-span-7,
+  .overflow-hidden,
+  .flex,
+  .flex-col,
+  .printable-document {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Polish the document card for elegant paper display */
+  .printable-document-card {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 1.5cm 1cm !important; /* Elegant margin sizing on standard A4 */
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Smoothly flow sections across page boundaries */
+  section,
+  .meeting-card,
+  table {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Explicit force overrides */
+  .print-force-show {
+    display: block !important;
+  }
+}
+

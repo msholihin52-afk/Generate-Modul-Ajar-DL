@@ -110,7 +110,7 @@ export function generateDocHtml(moduleData: GeneratedModuleContent): string {
   <h1>MODUL AJAR DEEP LEARNING</h1>
   <div class="sub-header">
     MATA PELAJARAN : ${moduleData.identitas.mataPelajaran.toUpperCase()}<br>
-    TOPIK : ${moduleData.identitas.alokasiWaktu ? moduleData.identitas.alokasiWaktu : ''}
+    TOPIK : ${moduleData.identitas.topik ? moduleData.identitas.topik : ''}
   </div>
 
   <div class="section-title">A. IDENTITAS MODUL</div>
@@ -120,6 +120,7 @@ export function generateDocHtml(moduleData: GeneratedModuleContent): string {
     <tr><td class="label-col">Mata Pelajaran</td><td class="sep-col">:</td><td class="val-col">${moduleData.identitas.mataPelajaran}</td></tr>
     <tr><td class="label-col">Kelas / Fase / Semester</td><td class="sep-col">:</td><td class="val-col">${moduleData.identitas.kelas} / ${moduleData.identitas.fase} / ${moduleData.identitas.semester}</td></tr>
     <tr><td class="label-col">Alokasi Waktu</td><td class="sep-col">:</td><td class="val-col">${moduleData.identitas.alokasiWaktu}</td></tr>
+    <tr><td class="label-col">Topik / Tema</td><td class="sep-col">:</td><td class="val-col">${moduleData.identitas.topik}</td></tr>
   </table>
 
   <div class="section-title">B. IDENTIFIKASI KESIAPAN PESERTA DIDIK</div>
@@ -357,13 +358,69 @@ export function generateDocHtml(moduleData: GeneratedModuleContent): string {
 </html>`;
 }
 
-export function downloadDocFile(moduleData: GeneratedModuleContent): void {
-  const htmlContent = generateDocHtml(moduleData);
+export function downloadDocFile(moduleData: GeneratedModuleContent, editedText?: string): void {
+  let htmlContent = "";
+  if (editedText) {
+    // Escape HTML characters to avoid corrupting Word document structure
+    const escapedText = editedText
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Convert escaped plain text lines to beautiful Word-compatible HTML
+    const formattedBody = escapedText.split('\n').map(line => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        return '<p>&nbsp;</p>';
+      }
+      
+      // Look for Section Titles (A., B., C., etc.) to format as header boxes
+      if (/^[A-N]\.\s+[A-Z\s\-]+$/.test(trimmed) || trimmed === 'DESAIN PEMBELAJARAN' || trimmed === 'LEMBAR KERJA PESERTA DIDIK (LKPD)') {
+        return `<h3 style="font-size: 11pt; font-weight: bold; margin-top: 14px; margin-bottom: 6px; background-color: #f2f2f2; padding: 3px 6px; border-left: 4px solid #1a365d; text-transform: uppercase;">${trimmed}</h3>`;
+      }
+      
+      // Look for subheadings or specific sub-elements like PERTEMUAN
+      if (trimmed.startsWith('PERTEMUAN') || trimmed.startsWith('MODUL AJAR DEEP LEARNING')) {
+        return `<h2 style="font-size: 12pt; font-weight: bold; text-align: center; margin-top: 18px; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 3px;">${trimmed}</h2>`;
+      }
+      
+      // Render standard lines as justified paragraphs
+      return `<p style="margin-top: 2px; margin-bottom: 6px; text-align: justify;">${trimmed}</p>`;
+    }).join('\n');
+
+    htmlContent = `<!DOCTYPE html>
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>MODUL AJAR DEEP LEARNING</title>
+<style>
+  @page {
+    size: A4;
+    margin: 2.5cm 2cm 2.5cm 2cm;
+  }
+  body {
+    font-family: 'Calibri', 'Arial', sans-serif;
+    font-size: 11pt;
+    line-height: 1.4;
+    color: #000000;
+  }
+</style>
+</head>
+<body>
+  <div style="font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; line-height: 1.4;">
+    ${formattedBody}
+  </div>
+</body>
+</html>`;
+  } else {
+    htmlContent = generateDocHtml(moduleData);
+  }
+
   const blob = new Blob(['\ufeff', htmlContent], {
     type: 'application/msword;charset=utf-8'
   });
 
-  const sanitizedSubject = moduleData.identitas.mataPelajaran.replace(/[^a-zA-Z0-0]/g, '_');
+  const sanitizedSubject = moduleData.identitas.mataPelajaran.replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `Modul_Ajar_Deep_Learning_${sanitizedSubject}.doc`;
 
   const link = document.createElement('a');

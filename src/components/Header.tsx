@@ -3,7 +3,7 @@ import { Sparkles } from 'lucide-react';
 
 export const Header: React.FC = () => {
   return (
-    <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 flex-none">
+    <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 flex-none print-force-hide">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-3">
         <div>
           <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">
