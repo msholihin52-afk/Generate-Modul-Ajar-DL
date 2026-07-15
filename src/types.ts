@@ -28,7 +28,8 @@ export type ModelPembelajaranOption =
   | 'Project Based Learning (PjBL)'
   | 'Problem Based Learning (PBL)'
   | 'Discovery Learning'
-  | 'Cooperative Learning';
+  | 'Cooperative Learning'
+  | 'Game Based Learning (GBL)';
 
 export interface ModuleFormData {
   namaPenyusun: string; // Kolom 1

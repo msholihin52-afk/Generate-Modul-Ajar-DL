@@ -69,6 +69,7 @@ const MODEL_PEMBELAJARAN_LIST: ModelPembelajaranOption[] = [
   'Problem Based Learning (PBL)',
   'Discovery Learning',
   'Cooperative Learning',
+  'Game Based Learning (GBL)',
 ];
 
 export const FormInputs: React.FC<FormInputsProps> = ({

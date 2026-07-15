@@ -215,7 +215,6 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [customText, setCustomText] = useState('');
-  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   // Reset customText and editing mode when a new module is generated
   useEffect(() => {
@@ -270,58 +269,7 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
     window.print();
   };
 
-  const handleDownloadPdf = () => {
-    if (!moduleData) return;
-    setIsDownloadingPdf(true);
-    
-    // Target the container that holds the printable content
-    const element = document.querySelector('.printable-document-card');
-    if (!element || !(element instanceof HTMLElement)) {
-      setIsDownloadingPdf(false);
-      return;
-    }
 
-    const sanitizedSubject = moduleData.identitas.mataPelajaran.replace(/[^a-zA-Z0-9]/g, '_');
-    const filename = `Modul_Ajar_Deep_Learning_${sanitizedSubject}.pdf`;
-
-    const opt = {
-      margin:       12, // 12mm margins
-      filename:     filename,
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { 
-        scale: 2.5, // Ultra-sharp rendering resolution
-        useCORS: true, 
-        logging: false 
-      },
-      jsPDF:        { 
-        unit: 'mm' as const, 
-        format: 'a4' as const, 
-        orientation: 'portrait' as const 
-      },
-      pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'] as any 
-      }
-    };
-
-    // Load html2pdf dynamically on-click to optimize initial app load time
-    import('html2pdf.js').then((html2pdfModule) => {
-      const html2pdf = html2pdfModule.default;
-      html2pdf()
-        .from(element)
-        .set(opt)
-        .save()
-        .then(() => {
-          setIsDownloadingPdf(false);
-        })
-        .catch((err: any) => {
-          console.error('PDF generation error:', err);
-          setIsDownloadingPdf(false);
-        });
-    }).catch((err) => {
-      console.error('Failed to load html2pdf.js:', err);
-      setIsDownloadingPdf(false);
-    });
-  };
 
   const handleResetEdit = () => {
     setCustomText('');
@@ -367,24 +315,6 @@ export const ModulePreview: React.FC<ModulePreviewProps> = ({ moduleData, isLoad
             <span>{copied ? 'Teks Tersalin!' : 'Salin Teks'}</span>
           </button>
 
-          {/* Tombol Download PDF */}
-          <button
-            type="button"
-            disabled={isDownloadingPdf}
-            onClick={handleDownloadPdf}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold text-xs transition shadow-sm ${
-              isDownloadingPdf
-                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
-                : 'bg-rose-600 hover:bg-rose-700 text-white'
-            }`}
-          >
-            {isDownloadingPdf ? (
-              <div className="w-3.5 h-3.5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <Download className="w-4 h-4" />
-            )}
-            <span>{isDownloadingPdf ? 'Memproses PDF...' : 'Download PDF'}</span>
-          </button>
 
           {/* Tombol Download .doc */}
           <button
