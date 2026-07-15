@@ -7,7 +7,27 @@ import {
   ModelPembelajaranOption,
 } from '../types';
 import { calculateFase } from '../utils/moduleGenerator';
-import { Sparkles, RefreshCw, UserCheck, School, BookOpen, Clock, Layers, Wand2 } from 'lucide-react';
+import { Sparkles, RefreshCw, UserCheck, School, BookOpen, Clock, Layers, Wand2, Calendar, MapPin } from 'lucide-react';
+
+const formatIndonesianDate = (dateStr: string): string => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  
+  const year = parts[0];
+  const monthIndex = parseInt(parts[1], 10) - 1;
+  const day = parseInt(parts[2], 10);
+  
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+  
+  if (monthIndex >= 0 && monthIndex < 12) {
+    return `${day} ${months[monthIndex]} ${year}`;
+  }
+  return dateStr;
+};
 
 interface FormInputsProps {
   formData: ModuleFormData;
@@ -65,6 +85,14 @@ export const FormInputs: React.FC<FormInputsProps> = ({
     // Auto-update Fase if Kelas changes
     if (field === 'kelas') {
       updatedData.fase = calculateFase(value as KelasOption);
+    }
+
+    // Auto-update lokasiTanggal if tempatPembuatan or tanggalPembuatan changes
+    if (field === 'tempatPembuatan' || field === 'tanggalPembuatan') {
+      const tempat = field === 'tempatPembuatan' ? value : (formData.tempatPembuatan || 'Larangan');
+      const tanggal = field === 'tanggalPembuatan' ? value : (formData.tanggalPembuatan || '2026-07-04');
+      const formattedDate = formatIndonesianDate(tanggal);
+      updatedData.lokasiTanggal = tempat && formattedDate ? `${tempat}, ${formattedDate}` : (tempat || formattedDate);
     }
 
     onChange(updatedData);
@@ -325,6 +353,59 @@ export const FormInputs: React.FC<FormInputsProps> = ({
               </select>
             </div>
           </div>
+        </div>
+
+        {/* BAGIAN 4: LOKASI & TANGGAL PEMBUATAN */}
+        <div>
+          <div className="flex items-center gap-2 mb-3 pb-1.5 border-b border-slate-200 text-slate-700 font-bold text-[11px] uppercase tracking-wider">
+            <Calendar className="w-4 h-4 text-blue-600" />
+            <span>Lokasi & Tanggal Pembuatan Modul</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Tempat Pembuatan */}
+            <div>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                Tempat Pembuatan <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={formData.tempatPembuatan || ''}
+                  onChange={(e) => handleInputChange('tempatPembuatan', e.target.value)}
+                  placeholder="Contoh: Larangan"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                />
+                <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              </div>
+            </div>
+
+            {/* Tanggal Pembuatan */}
+            <div>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                Tanggal Pembuatan <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="date"
+                  required
+                  value={formData.tanggalPembuatan || ''}
+                  onChange={(e) => handleInputChange('tanggalPembuatan', e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                />
+                <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              </div>
+            </div>
+          </div>
+          
+          {/* Tampilan Gabungan untuk Pratinjau */}
+          {formData.lokasiTanggal && (
+            <div className="mt-3 text-[10px] text-slate-500 bg-slate-50 px-3 py-1.5 rounded-md border border-slate-100 flex items-center gap-1.5">
+              <span className="font-semibold text-slate-700">Teks Tanda Tangan:</span>
+              <span className="italic font-mono text-blue-600">{formData.lokasiTanggal}</span>
+            </div>
+          )}
         </div>
 
         {/* STATUS PROSES LOADING */}

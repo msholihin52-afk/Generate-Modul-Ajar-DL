@@ -44,6 +44,8 @@ export interface ModuleFormData {
   alokasiWaktu: string; // Kolom 11
   modelPembelajaran: ModelPembelajaranOption; // Kolom 12
   lokasiTanggal?: string; // e.g., "Larangan, 4 Juli 2026"
+  tempatPembuatan?: string;
+  tanggalPembuatan?: string;
 }
 
 export interface PertemuanDetail {

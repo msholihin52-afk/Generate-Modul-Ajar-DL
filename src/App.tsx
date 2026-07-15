@@ -20,6 +20,8 @@ const INITIAL_FORM_DATA: ModuleFormData = {
   alokasiWaktu: '24 JP (8 kali pertemuan @3 JP)',
   modelPembelajaran: 'Project Based Learning (PjBL)',
   lokasiTanggal: 'Larangan, 4 Juli 2026',
+  tempatPembuatan: 'Larangan',
+  tanggalPembuatan: '2026-07-04',
 };
 
 export default function App() {
@@ -95,7 +97,9 @@ export default function App() {
       topik: '',
       alokasiWaktu: '24 JP (8 kali pertemuan @3 JP)',
       modelPembelajaran: 'Project Based Learning (PjBL)',
-      lokasiTanggal: 'Larangan, 4 Juli 2026',
+      lokasiTanggal: 'Larangan, 14 Juli 2026',
+      tempatPembuatan: 'Larangan',
+      tanggalPembuatan: '2026-07-14',
     });
     showToast('Form telah dibersihkan.');
   };
